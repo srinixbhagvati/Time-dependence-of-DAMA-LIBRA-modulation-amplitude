@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
+# In[12]:
 
 
 from scipy import stats
@@ -14,14 +14,14 @@ from scipy.optimize import minimize
 np.random.seed(0)
 
 
-# In[3]:
+# In[20]:
 
 
-data23 = np.genfromtxt('mean_12keV.csv', delimiter = ',').T
-data34 = np.genfromtxt('mean_23keV.csv', delimiter = ',').T
-data45 = np.genfromtxt('mean_34keV.csv', delimiter = ',').T
-data56 = np.genfromtxt('mean_45keV.csv', delimiter = ',').T
-data12 = np.genfromtxt('mean_56keV.csv', delimiter = ',').T
+data23 = np.genfromtxt('mean_23keV.csv', delimiter = ',').T
+data34 = np.genfromtxt('mean_34keV.csv', delimiter = ',').T
+data45 = np.genfromtxt('mean_45keV.csv', delimiter = ',').T
+data56 = np.genfromtxt('mean_56keV.csv', delimiter = ',').T
+data12 = np.genfromtxt('mean_12keV.csv', delimiter = ',').T
 
 example = np.array([1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14])
 #print(data23[1])
@@ -44,13 +44,14 @@ erry4 = np.flip(np.genfromtxt('errmean56.csv', delimiter = ',').T[1]/2)
 y5 = data12[1]
 x5 = data12[0]
 erry5 = np.flip(np.genfromtxt('errmean12.csv', delimiter = ',').T[1]/2)
+print(y5, erry5)
 
 erry_arr = [erry5, erry1, erry2, erry3, erry4]
 y_arr = [y5, y1, y2, y3, y4]
 x_arr = [x5, x1, x2, x3, x4]
 
 
-# In[7]:
+# In[21]:
 
 
 #######CONSTANT COSINE##############
@@ -111,7 +112,7 @@ def nestle_multi_cosine(loglike):
     return res.logz, pm, covm
 
 
-# In[8]:
+# In[22]:
 
 
 ##############LINE COSINE############
@@ -182,7 +183,7 @@ def nestle_multi_line(loglike):
     return res.logz, pm, covm
 
 
-# In[10]:
+# In[23]:
 
 
 ##############EXPONENTIAL############
@@ -252,7 +253,7 @@ def nestle_multi_exp(loglike):
     return res.logz, pm, covm
 
 
-# In[11]:
+# In[24]:
 
 
 def evaluateresults(func, nestlefunc, loglikearr):
@@ -330,7 +331,25 @@ print(bayesfactor(Z_exp, Z_cos))
 # In[29]:
 
 
-
+print("For constant fits: ")
+for i in range(len(params_cos)):
+    print("number ", i)
+    print("A: ", params_cos[i][0], "+/-", np.sqrt(cov_cos[i][0, 0]))
+    
+print("\n")
+print("For linear fits: ")
+print(cov_line[1][0, 0], cov_line[1][1, 1])
+for i in range(len(params_line)):
+    print("number ", i)
+    print("m: ", params_line[i][0], "+/-", np.sqrt(cov_line[i][0, 0]))
+    print("c: ", params_line[i][1], "+/-", np.sqrt(cov_line[i][1, 1]))
+    
+print("\n")
+print("For exponential fits: ")
+for i in range(len(params_exp)):
+    print("number ", i)
+    print("A: ", params_exp[i][0], "+/-", np.sqrt(cov_exp[i][0, 0]))
+    print("B: ", params_exp[i][1], "+/-", np.sqrt(cov_exp[i][1, 1]))
 
 
 # In[30]:
@@ -368,8 +387,8 @@ for i in range(len(loglike_exp)):
     #ax.set_title(data_titles[i])
     ax.errorbar(x_arr[i], y_arr[i], erry_arr[i], fmt = 'ko')
     ax.plot(x_plot, cosine(x_plot, params_cos[i])*(x_plot/x_plot), color = 'r', linewidth = 2.5, label = 'Constant $S_m$')
-    ax.plot(x_plot, linecosine(x_plot, params_line[i]), color = 'b', linewidth = 2.5, label = 'Linear $S_m$')
-    ax.plot(x_plot, expcosine(x_plot, params_exp[i]), color = 'k', linewidth = 2.5, label = 'Exponential $S_m$')
+    ax.plot(x_plot, linecosine(x_plot, params_line[i]), color = 'b', linestyle = 'dashed', linewidth = 2.5, label = 'Linear $S_m$')
+    ax.plot(x_plot, expcosine(x_plot, params_exp[i]), color = 'k', linestyle = 'dashdot', linewidth = 2.5, label = 'Exponential $S_m$')
     #plt.ylabel('A(cpd/kg/keV)')
     ax.tick_params(labelsize=38)
     if i == 0:
